@@ -89,36 +89,15 @@ docs: add API documentation for payment endpoints
 test: add unit tests for balance service
 ```
 
-#### PR Description Template:
+#### PR Template
 
-```markdown
-## Description
+The PR template is managed in `.github/pull_request_template.md`. When you create a new PR, the template will be automatically populated with the required sections:
 
-Brief description of what this PR does and why.
-
-## Type of Change
-
-- [ ] New feature
-- [ ] Bug fix
-- [ ] Breaking change
-- [ ] Documentation update
-
-## Related Issues
-
-Fixes #123
-
-## Testing
-
-Describe the tests you performed and how to verify them.
-
-## Checklist
-
-- [ ] My code follows the project's style guidelines
-- [ ] I have performed a self-review of my own code
-- [ ] I have commented my code, particularly in hard-to-understand areas
-- [ ] All new and existing tests pass
-- [ ] No new warnings generated
-```
+- **Description** - Explain what this PR does and why
+- **Type of Change** - Select the appropriate change type
+- **Related Issues** - Reference any related issues (e.g., `Fixes #123`)
+- **Testing** - Describe how you tested your changes
+- **Checklist** - Verify all items before requesting review
 
 ---
 
@@ -137,7 +116,7 @@ Follow conventional commit format for clear and organized commit history:
 - `refactor:` - Code restructuring
 - `docs:` - Documentation changes
 - `test:` - Test additions/modifications
-- `style:` - Code style changes (formatting, semicolons, etc.)
+- `style:` - Code style changes (formatting, etc.)
 - `chore:` - Build, dependencies, or other maintenance tasks
 
 **Examples (School Context):**
@@ -234,6 +213,184 @@ chore: update dependencies to latest versions
 
 ---
 
+## 👥 Team Internal Rules
+
+**These are human rules that complement GitHub's technical protections. GitHub enforces what it can, but team discipline ensures what it can't.**
+
+### Core Team Agreements:
+
+1. **🚫 No one commits directly to `main`**
+   - This is absolute. Even if you think you're a maintainer, use a PR
+   - Direct commits to `main` may be rejected or reverted
+
+2. **👥 No self-merges - Peer review is mandatory**
+   - You **CANNOT** approve and merge your own PR
+   - Your PR must be approved by at least one other team member
+   - If your team agrees on mandatory cross-review, then EVERYONE needs approval from someone else
+   - This ensures fresh eyes on every change
+
+3. **🎫 Every change must come from an issue or task**
+   - Before creating a branch, verify there's a corresponding issue/ticket
+   - Reference it in your PR title or description: `fix: resolve #45`
+   - This maintains traceability and context for future developers
+
+4. **📦 Every PR should be small and focused**
+   - One logical intention per PR
+   - Easier to review, test, and revert if needed
+   - Target: Keep PRs under 400 lines of code changes
+
+5. **🔪 If a PR exceeds the size limit, split it**
+   - Large PRs take longer to review and are harder to understand
+   - Split into multiple smaller PRs targeting logical features
+   - Example: Instead of "feat: complete payment system", split into:
+     - `feat: add payment gateway endpoint`
+     - `feat: implement payment validation`
+     - `feat: add payment success notification`
+
+6. **⚔️ If there are conflicts, the PR author resolves them**
+   - It's the author's responsibility to keep their branch updated
+   - Before requesting merge, update your branch with `develop`
+   - Fix conflicts yourself before asking for review
+   - This prevents bottlenecks and keeps the process flowing
+
+7. **👀 Reviewers must actually validate the code**
+   - **Don't approve "blindly"** - this defeats the purpose of code review
+   - Reviewers should:
+     - ✅ Read and understand the code
+     - ✅ Run tests locally (when possible)
+     - ✅ Verify the changes work as intended
+     - ✅ Check for security issues
+     - ✅ Ask questions if anything is unclear
+   - Approval is a professional commitment, not a checkbox
+
+---
+
+## 🤝 Conflict Prevention & Resolution
+
+**Conflicts are reduced dramatically with discipline and coordination. Here's how to minimize and handle them:**
+
+### Prevention Strategy:
+
+**1. Keep branches short-lived**
+
+- Features should be completed and merged within 1-3 days
+- The longer a branch exists, the more likely conflicts arise
+- Quick, frequent merges to `develop` reduce integration problems
+
+**2. Always work from the latest `develop`**
+
+- Before starting a branch: `git pull origin develop`
+- Before requesting merge: `git pull origin develop` (again)
+- Before merging: Ensure your branch is up-to-date
+- GitHub can enforce this rule, but manual discipline helps too
+
+**3. Don't leave branches open for days**
+
+- Abandoned branches cause stale PRs
+- If you need to pause, communicate it in the PR
+- Other developers shouldn't have to wait for your branch
+
+**4. Coordinate if working on related modules**
+
+- If two team members will work on the same file/module, discuss it first via an issue
+- Assign tasks clearly in your issue tracker
+- Prevent overlapping work before it happens
+- Example:
+  - Dev A: "I'm doing payment validation logic"
+  - Dev B: "I'll do payment endpoint routing"
+  - Agreed: Coordinate via PR before merge
+
+### GitHub's Enforcement:
+
+- ✅ **Require branches to be up-to-date before merge** - GitHub setting enabled
+- ✅ **This automatically detects conflicts** before entering `main`
+- ✅ **Force push disabled** - Prevents accidental history rewrites
+
+### Handling Conflicts When They Occur:
+
+1. **Author receives a conflict notification**
+
+   ```bash
+   # Update your branch
+   git fetch origin
+   git merge origin/develop
+
+   # Manually resolve conflicts (editor will show them)
+   # Then commit the merge
+   git add .
+   git commit -m "merge: resolve conflicts with develop"
+   git push origin feature/your-feature
+   ```
+
+2. **Review the conflict carefully**
+   - Don't just delete code blindly
+   - Understand what changed in `develop` vs your branch
+   - Test after resolving to ensure nothing broke
+
+3. **Re-request review**
+   - Add a comment: "Conflicts resolved, ready for re-review"
+   - Wait for approval again if needed
+
+### ⏰ Ideal Workflow Timeline
+
+| Stage     | Time    | Action                  |
+| --------- | ------- | ----------------------- |
+| Create PR | Day 1   | Open PR, request review |
+| Review    | Day 1-2 | Reviewer tests locally  |
+| Feedback  | Day 2   | Address comments        |
+| Merge     | Day 2-3 | PR merged to `develop`  |
+| Close     | Day 3   | Branch deleted          |
+
+**Total time per PR: 1-3 days maximum**
+
+### 🚨 Conflict Resolution Example
+
+Scenario: You and a teammate both modified a core service file
+
+```bash
+# 1. Fetch latest
+git fetch origin
+
+# 2. Try to rebase
+git rebase origin/develop
+
+# Output:
+# CONFLICT (content): Merge conflict in src/services/payment.service
+# error: could not apply abc123... feat: add payment retry logic
+
+# 3. Edit the file, look for markers:
+# <<<<<<<< HEAD
+# Your changes here
+# ========
+# Teammate's changes here
+# >>>>>>> origin/develop
+
+# 4. Decide what to keep, remove markers:
+# Final version with both changes merged properly
+
+# 5. Mark as resolved and continue
+git add src/services/student.service
+git rebase --continue
+
+# 6. Push (with lease to be safe)
+git push origin feature/student-retry --force-with-lease
+
+# 7. PR is now clean and ready to merge
+```
+
+### 📋 Conflict Checklist
+
+Before pushing after resolving conflicts:
+
+- [ ] Conflict markers are completely removed
+- [ ] Code compiles/lints without errors
+- [ ] Tests pass locally
+- [ ] Functionality works as expected
+- [ ] Both sets of changes are preserved (if applicable)
+- [ ] Teammate notified (if their code was involved)
+
+---
+
 ## 📊 Quick Reference Guide
 
 | Element   | Pattern                | Example                              |
@@ -253,7 +410,7 @@ chore: update dependencies to latest versions
 4. **✅ Code review required** - No self-merging, always wait for approval
 5. **✅ Use atomic commits** - One logical change per commit
 6. **✅ Consistency is mandatory** - No exceptions to naming conventions
-7. **❓ Questions?** - Ask the full-stack before pushing
+7. **❓ Questions?** - Ask the tech lead before pushing
 
 ---
 
@@ -262,13 +419,31 @@ chore: update dependencies to latest versions
 ### Prerequisites
 
 - Git
+- Your preferred development environment setup (tech stack will be defined separately)
 
-### Installation
+### Initial Setup
 
-```bash
-git clone <repository-url> backend
-cd school-ps/backend
-```
+1. **Clone the repository**
+
+   ```bash
+   git clone <repository-url>
+   cd school-ps/backend
+   ```
+
+2. **Configure Git**
+
+   ```bash
+   git config user.name "Your Name"
+   git config user.email "your.email@example.com"
+   ```
+
+3. **Create develop branch locally** (if not already present)
+
+   ```bash
+   git checkout -b develop origin/develop
+   ```
+
+4. **Follow project setup documentation** - Refer to the project's tech-specific setup guide for environment configuration and dependencies
 
 ---
 
@@ -278,6 +453,13 @@ cd school-ps/backend
 - All examples should reflect school/payment context
 - Branch protection is in place for safety and quality assurance
 - CI/CD pipeline ensures code quality before production
+- Technology stack details are documented in separate setup guides
+
+---
+
+## 📞 Support
+
+For questions about this workflow or branch protection rules, reach out to the tech lead or team.
 
 ---
 
