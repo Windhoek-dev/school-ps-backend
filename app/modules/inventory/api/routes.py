@@ -31,3 +31,8 @@ async def create_type_inventory(
 ):
     create_type_app = CreateTypeInventory(session=session)
     return await create_type_app.execute(create_type_request)
+
+
+@router.path("/items/{item_id}")
+async def update_item():
+    return "success update item"
