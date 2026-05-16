@@ -35,7 +35,7 @@ class InventoryRepository:
         self.session.refresh(new_type)
 
         return new_type
-    
+
     async def update_item(self, item_id: int, item_data: UpdateItemRequest):
         item = self.session.get(Inventario, item_id)
         if not item:
