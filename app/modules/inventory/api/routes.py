@@ -6,8 +6,10 @@ from app.modules.inventory.application.get_items_inventory import GetItemsInvent
 from app.modules.inventory.schemas.request import (
     CreateItemRequest,
     CreateTypeInventoryRequest,
+    UpdateItemRequest,
 )
 from app.modules.inventory.application.create_type_inventory import CreateTypeInventory
+from app.modules.inventory.application.update_item_inventory import UpdateItemInventory
 
 
 router = APIRouter()
@@ -32,7 +34,9 @@ async def create_type_inventory(
     create_type_app = CreateTypeInventory(session=session)
     return await create_type_app.execute(create_type_request)
 
-
-@router.get("/items/{item_id}")
-async def update_item():
-    return "success update item"
+@router.put("/items/{item_id}")
+async def update_item(
+    session: SessionDep, item_id: int, update_item_request: UpdateItemRequest
+):
+    update_item_app = UpdateItemInventory(session=session)
+    return await update_item_app.execute(item_id=item_id, item_data=update_item_request)

@@ -2,7 +2,7 @@ from sqlmodel import select
 
 from app.core.db import SessionDep
 from app.modules.inventory.infrastructure.models import Inventario, TipoInventario
-from app.modules.inventory.schemas.request import CreateItemRequest
+from app.modules.inventory.schemas.request import CreateItemRequest, UpdateItemRequest
 
 
 class InventoryRepository:
@@ -35,3 +35,20 @@ class InventoryRepository:
         self.session.refresh(new_type)
 
         return new_type
+    
+    async def update_item(self, item_id: int, item_data: UpdateItemRequest):
+        item = self.session.get(Inventario, item_id)
+        if not item:
+            return None
+
+        item.tipo_inventario_id = item_data.tipo_inventario_id
+        item.nombre = item_data.nombre
+        item.cantidad = item_data.cantidad
+        item.estado_objeto = item_data.estado_objeto
+        item.observacion = item_data.observacion
+
+        self.session.add(item)
+        self.session.commit()
+        self.session.refresh(item)
+
+        return item
