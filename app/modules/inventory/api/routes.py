@@ -33,6 +33,6 @@ async def create_type_inventory(
     return await create_type_app.execute(create_type_request)
 
 
-@router.path("/items/{item_id}")
+@router.get("/items/{item_id}")
 async def update_item():
     return "success update item"
