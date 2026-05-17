@@ -14,7 +14,7 @@ class CreateItemRequest(BaseModel):
         ge=1, description="ID del tipo de inventario al que pertenece el item"
     )
     nombre: str = Field(min_length=2, max_length=100, description="Nombre del item")
-    cantidad: int = Field(ge=0, description="Cantidad del item")
+    cantidad: int = Field(ge=1, description="Cantidad del item")
     estado_objeto: str = Field(
         min_length=2, max_length=100, description="Estado del objeto"
     )
@@ -39,7 +39,7 @@ class CreateBorrowRequest(BaseModel):
         ge=1, description="ID del estudiante que presta el articulo"
     )
     fecha_salida: datetime = Field(
-        description="Fecha de préstamo en formato YYYY-MM-DD"
+        description="Fecha de préstamo en formato YYYY-MM-DD", examples=[datetime.now()]
     )
     cantidad: int = Field(ge=1, description="Cantidad del articulo a prestar")
     estado_prestamo: bool = Field(description="Estado del préstamo")
