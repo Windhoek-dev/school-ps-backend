@@ -75,3 +75,13 @@ class InventoryRepository:
         self.session.refresh(new_borrow)
 
         return new_borrow
+
+    async def update_amount_item(self, id: int, amount: int):
+        item = self.session.exec(select(Inventario).where(Inventario.id == id)).one()
+
+        item.cantidad = amount
+        self.session.add(item)
+        self.session.commit()
+        self.session.refresh(item)
+
+        return item
