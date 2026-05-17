@@ -12,7 +12,7 @@ class InventoryService:
         self.repository = repository
 
     async def get_inventory(self):
-        return await self.repository.get_inventory()
+        return await self.repository.get_items()
 
     async def create_item(self, item_data: CreateItemRequest):
         return await self.repository.create_item(item_data)

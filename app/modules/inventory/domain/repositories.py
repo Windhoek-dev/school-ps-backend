@@ -17,7 +17,7 @@ class InventoryRepository:
     def __init__(self, session: SessionDep):
         self.session = session
 
-    async def get_inventory(self):
+    async def get_items(self):
         return self.session.exec(select(Inventario)).all()
 
     async def create_item(self, item_data: CreateItemRequest):
