@@ -5,14 +5,33 @@ from app.modules.inventory.schemas.request import (
     CreateTypeInventoryRequest,
     UpdateItemRequest,
 )
+from app.shared.schemas.filter_pagination import FilterPagination
+from app.shared.utils.filter_pagination import calculate_offset
 
 
 class InventoryService:
     def __init__(self, repository: InventoryRepository):
         self.repository = repository
 
-    async def get_inventory(self):
-        return await self.repository.get_items()
+    async def get_inventory(self, filter_pagination: FilterPagination):
+        offset = calculate_offset(filter_pagination.page, filter_pagination.limit)
+
+        if not filter_pagination.item_type:
+            return await self.repository.get_items_pagination(
+                offset=offset, limit=filter_pagination.limit
+            )
+
+        type_id = await self.repository.get_type_id_by_name(filter_pagination.item_type)
+        if not type_id:
+            return await self.repository.get_items_pagination(
+                offset=offset, limit=filter_pagination.limit
+            )
+
+        return await self.repository.get_items_filter_pagination(
+            offset=offset,
+            limit=filter_pagination.limit,
+            type_id=type_id,
+        )
 
     async def create_item(self, item_data: CreateItemRequest):
         return await self.repository.create_item(item_data)

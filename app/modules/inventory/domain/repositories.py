@@ -17,8 +17,23 @@ class InventoryRepository:
     def __init__(self, session: SessionDep):
         self.session = session
 
-    async def get_items(self):
-        return self.session.exec(select(Inventario)).all()
+    async def get_items_pagination(self, offset: int, limit: int):
+        return self.session.exec(select(Inventario).offset(offset).limit(limit)).all()
+
+    async def get_type_id_by_name(self, item_type: str) -> int | None:
+        result = self.session.exec(
+            select(TipoInventario).where(TipoInventario.nombre == item_type)
+        ).one_or_none()
+
+        return result.id if result else None
+
+    async def get_items_filter_pagination(self, offset: int, limit: int, type_id: int):
+        return self.session.exec(
+            select(Inventario)
+            .where(Inventario.tipo_inventario_id == type_id)
+            .offset(offset)
+            .limit(limit)
+        ).all()
 
     async def create_item(self, item_data: CreateItemRequest):
         new_item = Inventario(

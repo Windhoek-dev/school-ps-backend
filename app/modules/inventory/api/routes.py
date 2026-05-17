@@ -1,4 +1,6 @@
-from fastapi import APIRouter, status
+from typing import Annotated
+
+from fastapi import APIRouter, Query, status
 
 from app.core.db import SessionDep
 from app.modules.inventory.application.create_borrowing_inventory import (
@@ -20,21 +22,30 @@ from app.modules.inventory.schemas.response import (
     CreateTypeInventoryResponse,
     UpdateItemInventoryResponse,
 )
+from app.shared.schemas.filter_pagination import FilterPagination
 from app.shared.utils.response import Response
 
 router = APIRouter()
 
 
 @router.get("/items")
-async def get_inventory(session: SessionDep):
+async def get_inventory(
+    session: SessionDep, filter_pagination_query: Annotated[FilterPagination, Query()]
+):
     inventory_app = GetItemsInventory(session=session)
-    data = await inventory_app.execute()
+    data = await inventory_app.execute(filter_pagination=filter_pagination_query)
 
-    return Response(
-        data=data,
-        message="Inventario obtenido exitosamente",
-        status_code=status.HTTP_200_OK,
-        details={"message": "Inventario obtenido exitosamente"},
+    return (
+        Response(
+            data=data,
+            message="Inventario obtenido exitosamente",
+            status_code=status.HTTP_200_OK,
+            details={"message": "Inventario obtenido exitosamente"},
+        )
+        .filterPagination(
+            page=filter_pagination_query.page, limit=filter_pagination_query.limit
+        )
+        .to_dict()
     )
 
 
@@ -49,7 +60,7 @@ async def create_item(session: SessionDep, create_item_request: CreateItemReques
             message="Error al crear el articulo",
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             details={"message": "Error al crear el articulo"},
-        )
+        ).to_dict()
 
     if not data.id:
         return Response(
@@ -57,7 +68,7 @@ async def create_item(session: SessionDep, create_item_request: CreateItemReques
             message="Error al crear el articulo",
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             details={"message": "Error al crear el articulo"},
-        )
+        ).to_dict()
 
     return Response(
         data=CreateItemInventoryResponse(
@@ -70,7 +81,7 @@ async def create_item(session: SessionDep, create_item_request: CreateItemReques
         message="Articulo creado exitosamente",
         status_code=status.HTTP_201_CREATED,
         details={"message": "Articulo creado exitosamente"},
-    )
+    ).to_dict()
 
 
 @router.post("/types")
@@ -86,14 +97,14 @@ async def create_type_inventory(
             message="Error al crear el tipo de inventario",
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             details={"message": "Error al crear el tipo de inventario"},
-        )
+        ).to_dict()
 
     return Response(
         data=CreateTypeInventoryResponse(id=data.id, nombre=data.nombre),
         message="Tipo de inventario creado exitosamente",
         status_code=status.HTTP_201_CREATED,
         details={"message": "Tipo de inventario creado exitosamente"},
-    )
+    ).to_dict()
 
 
 @router.put("/items/{item_id}")
@@ -109,7 +120,7 @@ async def update_item(
             message="Error al actualizar el articulo",
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             details={"message": "Error al actualizar el articulo"},
-        )
+        ).to_dict()
 
     if not data.id:
         return Response(
@@ -117,7 +128,7 @@ async def update_item(
             message="Error al actualizar el articulo",
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             details={"message": "Error al actualizar el articulo"},
-        )
+        ).to_dict()
 
     return Response(
         data=UpdateItemInventoryResponse(
@@ -130,7 +141,7 @@ async def update_item(
         message="Articulo actualizado exitosamente",
         status_code=status.HTTP_200_OK,
         details={"message": "Articulo actualizado exitosamente"},
-    )
+    ).to_dict()
 
 
 @router.post("/borrow")
@@ -145,7 +156,7 @@ async def create_borrowing(session: SessionDep, borrow_data: CreateBorrowRequest
             message="Error al crear el prestamo",
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             details={"message": "Error al crear el prestamo"},
-        )
+        ).to_dict()
 
     if not data.id:
         return Response(
@@ -153,7 +164,7 @@ async def create_borrowing(session: SessionDep, borrow_data: CreateBorrowRequest
             message="Error al crear el prestamo",
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             details={"message": "Error al crear el prestamo"},
-        )
+        ).to_dict()
 
     return Response(
         data=CreateItemBorrowingResponse(
@@ -166,4 +177,4 @@ async def create_borrowing(session: SessionDep, borrow_data: CreateBorrowRequest
         message="Prestamo creado exitosamente",
         status_code=status.HTTP_201_CREATED,
         details={"message": "Prestamo creado exitosamente"},
-    )
+    ).to_dict()
