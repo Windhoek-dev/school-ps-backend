@@ -6,6 +6,7 @@ from app.modules.inventory.schemas.request import (
     CreateItemRequest,
     FilterPaginationBorrowings,
     FilterPaginationInventory,
+    UpdateCompleteItemRequest,
     UpdateSingleItemRequest,
 )
 
@@ -29,6 +30,8 @@ class FilterPaginationBorrowingDeportes(FilterPaginationBorrowings):
 class CreateSportItemRequest(CreateItemRequest):
     pass
 
+class UpdateItemDeportesComplete(UpdateCompleteItemRequest):
+    pass
 
 class UpdateItemDeportes(UpdateSingleItemRequest):
     pass
